@@ -1,0 +1,29 @@
+#!/bin/bash
+DIRECTORY=`dirname "$ABSOLUTE_FILENAME"`
+echo "Enter directory with .exr files."
+read path_to_exr
+cd $path_to_exr
+files=`ls | grep ".exr" `
+IFS=' ' read -a array <<< "$files"
+if [ "${#array[@]}" == 0 ]; then
+    echo "Insert folder with .exr"
+else
+
+    string="${array[0]}"
+    char_numbers=0
+    digit_numbers=0
+    i=0
+    while [ "$i" -lt "${#string}" ]
+    do
+        if [[ ${string:$i:1} == [0-9] ]];then
+            let "digit_numbers += 1"
+        fi
+        let "i += 1"
+    done
+    char_numbers=$((i - digit_numbers - 4))
+    prefix="${string:0:3}"
+    result="$prefix"%0"$digit_numbers""d".exr""
+    cd $path_to_exr
+    ffmpeg -framerate 30  -y  -i $result -c:v libx264  out.mov
+fi
+
